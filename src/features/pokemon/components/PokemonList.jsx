@@ -1,34 +1,23 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-
-// Simple throttle function
-function throttle(callback, limit) {
-  let waiting = false;
-  return function() {
-    if (!waiting) {
-      callback.apply(this, arguments);
-      waiting = true;
-      setTimeout(() => {
-        waiting = false;
-      }, limit);
-    }
-  };
-}
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { usePokemonList } from '@/features/pokemon/hooks/usePokemonList';
+import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import PokemonCard from './PokemonCard';
 
 export default function PokemonList() {
   const [displayCount, setDisplayCount] = useState(30);
-  const { data: pokemons = [], isLoading, isError } = usePokemonList(displayCount);
+  const {
+    data: pokemons = [],
+    isLoading,
+    isError,
+  } = usePokemonList(displayCount);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const scrollPosition = useRef(0);
   const prevPokemonsLength = useRef(0);
 
-  // Save scroll position before new items are loaded
   const saveScrollPosition = () => {
     scrollPosition.current = window.scrollY;
   };
 
-  // Restore scroll position after new items are loaded
   const restoreScrollPosition = useCallback(() => {
     if (pokemons.length > prevPokemonsLength.current) {
       window.scrollTo(0, scrollPosition.current);
@@ -36,10 +25,8 @@ export default function PokemonList() {
     prevPokemonsLength.current = pokemons.length;
   }, [pokemons.length]);
 
-  // Reset loading state when data changes
   useEffect(() => {
     if (pokemons.length > 0) {
-      // Small delay to ensure the DOM has updated
       const timer = setTimeout(() => {
         setIsLoadingMore(false);
       }, 100);
@@ -47,43 +34,17 @@ export default function PokemonList() {
     }
   }, [pokemons]);
 
-  // Handle infinite scroll
-  useEffect(() => {
-    const handleScroll = () => {
-      // Check if we're near the bottom of the page
-      const scrollThreshold = 200; // pixels from bottom
-      const scrollPosition = window.innerHeight + document.documentElement.scrollTop;
-      const bottomPosition = document.documentElement.offsetHeight - scrollThreshold;
-      
-      if (
-        scrollPosition >= bottomPosition &&
-        !isLoading &&
-        !isLoadingMore &&
-        Array.isArray(pokemons) &&
-        pokemons.length > 0
-      ) {
-        saveScrollPosition();
-        setDisplayCount((prev) => prev + 30);
-        setIsLoadingMore(true);
-      }
-    };
+  useInfiniteScroll({
+    isLoading: isLoading || isLoadingMore,
+    onLoadMore: () => {
+      saveScrollPosition();
+      setIsLoadingMore(true);
+      setDisplayCount((prev) => prev + 30);
+    },
+  });
 
-    // Add throttle to scroll event
-    const throttledScroll = throttle(handleScroll, 200);
-    window.addEventListener('scroll', throttledScroll);
-    
-    // Initial check in case the content doesn't fill the viewport
-    handleScroll();
-    
-    return () => {
-      window.removeEventListener('scroll', throttledScroll);
-    };
-  }, [isLoading, isLoadingMore, pokemons]);
-
-  // Restore scroll position after new data is loaded
   useEffect(() => {
     if (!isLoading && !isLoadingMore) {
-      // Small delay to ensure the DOM has updated with new items
       const timer = setTimeout(() => {
         restoreScrollPosition();
       }, 50);
@@ -91,7 +52,6 @@ export default function PokemonList() {
     }
   }, [isLoading, isLoadingMore, restoreScrollPosition]);
 
-  // Show loading state
   if (isLoading && (!pokemons || pokemons.length === 0)) {
     return (
       <div className="flex justify-center py-12">
@@ -105,7 +65,6 @@ export default function PokemonList() {
     );
   }
 
-  // Show error state
   if (isError) {
     return (
       <div className="text-center p-8">
@@ -117,7 +76,6 @@ export default function PokemonList() {
     );
   }
 
-  // Show empty state
   if (!Array.isArray(pokemons) || pokemons.length === 0) {
     return (
       <div className="text-center p-8">
@@ -132,11 +90,11 @@ export default function PokemonList() {
   return (
     <div className="relative">
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 px-2">
-        {pokemons.map((pokemon) => (
+        {pokemons.map((pokemon) =>
           pokemon && pokemon.id ? (
             <PokemonCard key={pokemon.id} pokemon={pokemon} />
           ) : null
-        ))}
+        )}
       </div>
 
       {isLoadingMore && (
