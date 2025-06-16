@@ -1,0 +1,63 @@
+import { useEffect, useState } from 'react';
+import { useTeamActions } from '@/features/team/hooks/useTeamActions';
+
+export default function SaveTeamInput() {
+  const { saveTeam, isTeamEmpty } = useTeamActions();
+  const [name, setName] = useState('');
+
+  const handleSave = () => {
+    if (name.trim() && !isTeamEmpty) {
+      saveTeam(name);
+      const saveBtn = document.getElementById('save-team-btn');
+      if (saveBtn) {
+        saveBtn.classList.add('animate-ping');
+        setTimeout(() => saveBtn.classList.remove('animate-ping'), 300);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const input = document.getElementById('team-name-input');
+    if (input) input.focus();
+  }, []);
+
+  return (
+    <>
+      <div className="relative w-full max-w-xs">
+        <input
+          id="team-name-input"
+          type="text"
+          placeholder="Team name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && handleSave()}
+          className="w-full px-4 py-2 text-sm bg-white/90 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent shadow-inner"
+        />
+      </div>
+
+      <button
+        id="save-team-btn"
+        onClick={handleSave}
+        disabled={isTeamEmpty || !name.trim()}
+        className={`px-6 py-2 bg-gradient-to-b from-yellow-400 to-yellow-600 text-gray-900 text-sm font-bold rounded-lg border-2 border-yellow-700 shadow-md hover:from-yellow-300 hover:to-yellow-500 active:translate-y-0.5 transition-all duration-200 flex items-center justify-center min-w-[120px] ${
+          isTeamEmpty || !name.trim() ? 'opacity-50 cursor-not-allowed' : ''
+        }`}
+      >
+        <svg
+          className="w-4 h-4 mr-1"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+          />
+        </svg>
+        Save
+      </button>
+    </>
+  );
+}

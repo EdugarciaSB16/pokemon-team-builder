@@ -5,7 +5,6 @@ export default function TeamSlots() {
   const team = useTeamStore((state) => state.team);
   const removePokemon = useTeamStore((state) => state.removePokemon);
 
-  // Ensure we always have 6 slots
   const slots = Array(6).fill(null);
   team.forEach((pokemon, index) => {
     if (index < 6) slots[index] = pokemon;
@@ -18,7 +17,9 @@ export default function TeamSlots() {
           <TeamSlot
             key={index}
             pokemon={pokemon}
-            onRemove={pokemon ? () => removePokemon(team.indexOf(pokemon)) : null}
+            onRemove={
+              pokemon ? () => removePokemon(team.indexOf(pokemon)) : null
+            }
             slotNumber={index + 1}
           />
         ))}
