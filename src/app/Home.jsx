@@ -1,5 +1,6 @@
 import TeamSlots from '@/features/team/components/TeamSlots';
 import TeamActions from '@/features/team/components/TeamActions';
+import PokemonList from '@/features/pokemon/components/PokemonList';
 
 export default function Home() {
   return (
@@ -9,6 +10,7 @@ export default function Home() {
       </h1>
       <TeamSlots />
       <TeamActions />
+      <PokemonList />
     </main>
   );
 }
