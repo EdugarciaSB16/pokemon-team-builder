@@ -1,11 +1,14 @@
-import React from 'react';
+import TeamSlots from '@/features/team/components/TeamSlots';
+import TeamActions from '@/features/team/components/TeamActions';
 
-const Home = () => {
+export default function Home() {
   return (
-    <div>
-      <div className="text-2xl">Team Builder</div>
-    </div>
+    <main className="px-6 py-10">
+      <h1 className="text-xl mb-4 text-center font-bold">
+        Pokémon Team Builder
+      </h1>
+      <TeamSlots />
+      <TeamActions />
+    </main>
   );
-};
-
-export default Home;
+}
