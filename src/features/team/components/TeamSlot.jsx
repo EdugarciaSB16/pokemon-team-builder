@@ -1,7 +1,6 @@
 import { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import TeamSlotWrapper from './TeamSlotWrapper';
-import TeamSlotEmpty from './TeamSlotEmpty';
 import TeamSlotContent from './TeamSlotContent';
 
 const ItemType = 'TEAM_SLOT';

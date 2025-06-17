@@ -1,119 +1,120 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-const emptySlot = null;
+const EMPTY_SLOT = null;
+const EMPTY_TEAM = Array(6).fill(EMPTY_SLOT);
 
 export const useTeamStore = create(
   persist(
     (set, get) => ({
-      team: [emptySlot, emptySlot, emptySlot, emptySlot, emptySlot, emptySlot],
+      // Current team in slots
+      slots: EMPTY_TEAM,
+      // Saved teams
       savedTeams: [],
-      draftName: '',
+      // Draft state
+      isDraft: false,
 
+      // Add pokemon to first empty slot
       addPokemon: (pokemon) => {
-        const { team } = get();
-        const index = team.findIndex((slot) => slot === null);
+        const { slots } = get();
+        const index = slots.findIndex((slot) => slot === EMPTY_SLOT);
         if (index === -1) return;
-        const newTeam = [...team];
-        newTeam[index] = pokemon;
-        set({ team: newTeam });
+
+        const newSlots = [...slots];
+        newSlots[index] = pokemon;
+        set({
+          slots: newSlots,
+          isDraft: true,
+        });
       },
 
+      // Remove pokemon from specific slot
       removePokemon: (index) => {
-        const { team } = get();
-        const newTeam = [...team];
-        newTeam[index] = null;
-        set({ team: newTeam });
+        const { slots } = get();
+        const newSlots = [...slots];
+        newSlots[index] = EMPTY_SLOT;
+        set({
+          slots: newSlots,
+          isDraft: true,
+        });
       },
 
-      reorderTeam: (newOrder) => set({ team: newOrder }),
+      // Reorder slots with drag and drop
+      reorderTeam: (newOrder) =>
+        set({
+          slots: newOrder,
+          isDraft: true,
+        }),
 
+      // Randomize team order
       randomizeTeam: () => {
-        const { team } = get();
-        const shuffled = [...team].sort(() => Math.random() - 0.5);
-        set({ team: shuffled });
+        const { slots } = get();
+        const pokemons = slots.filter(Boolean);
+        const shuffled = [...pokemons].sort(() => Math.random() - 0.5);
+        const newSlots = [...EMPTY_TEAM];
+        shuffled.forEach((pokemon, index) => {
+          newSlots[index] = pokemon;
+        });
+        set({
+          slots: newSlots,
+          isDraft: true,
+        });
       },
 
+      // Sort by attack stat
       sortByAttack: () => {
-        const { team } = get();
-        const sorted = [...team].filter(Boolean).sort((a, b) => {
+        const { slots } = get();
+        const pokemons = slots.filter(Boolean);
+        const sorted = pokemons.sort((a, b) => {
           const aAtk =
             a.stats.find((s) => s.stat.name === 'attack')?.base_stat || 0;
           const bAtk =
             b.stats.find((s) => s.stat.name === 'attack')?.base_stat || 0;
           return bAtk - aAtk;
         });
-
-        const filled = [...sorted, ...Array(6 - sorted.length).fill(null)];
-        set({ team: filled });
+        const newSlots = [...EMPTY_TEAM];
+        sorted.forEach((pokemon, index) => {
+          newSlots[index] = pokemon;
+        });
+        set({
+          slots: newSlots,
+          isDraft: true,
+        });
       },
 
+      // Save current team
       saveTeam: (name) => {
-        const { team, savedTeams } = get();
-        const validTeam = team.filter(Boolean);
+        const { slots, savedTeams } = get();
+        const validTeam = slots.filter(Boolean);
         if (validTeam.length === 0) return;
 
         const newTeam = {
           id: crypto.randomUUID(),
-          name: name || `Equipo ${savedTeams.length + 1}`,
-          pokemons: [...team],
+          name: name || `Team ${savedTeams.length + 1}`,
+          slots: [...slots],
+          createdAt: Date.now(),
         };
 
         set({
           savedTeams: [...savedTeams, newTeam],
-          team: [
-            emptySlot,
-            emptySlot,
-            emptySlot,
-            emptySlot,
-            emptySlot,
-            emptySlot,
-          ],
-          draftName: '',
+          slots: EMPTY_TEAM,
+          isDraft: false,
         });
       },
 
+      // Delete a saved team
       deleteTeam: (id) => {
         const { savedTeams } = get();
-        set({ savedTeams: savedTeams.filter((team) => team.id !== id) });
-      },
-
-      editTeamName: (id, newName) => {
-        const { savedTeams } = get();
         set({
-          savedTeams: savedTeams.map((team) =>
-            team.id === id ? { ...team, name: newName } : team
-          ),
+          savedTeams: savedTeams.filter((team) => team.id !== id),
         });
       },
 
-      duplicateTeam: (id) => {
-        const { savedTeams } = get();
-        const teamToDuplicate = savedTeams.find((team) => team.id === id);
-        if (!teamToDuplicate) return;
-        const duplicatedTeam = {
-          ...teamToDuplicate,
-          id: crypto.randomUUID(),
-          name: `${teamToDuplicate.name} (Copia)`,
-        };
-        set({ savedTeams: [...savedTeams, duplicatedTeam] });
-      },
-
-      saveDraft: (name) => {
-        set({ draftName: name || 'Borrador automático' });
-      },
-
+      // Discard current draft
       discardDraft: () => {
         set({
-          team: [
-            emptySlot,
-            emptySlot,
-            emptySlot,
-            emptySlot,
-            emptySlot,
-            emptySlot,
-          ],
-          draftName: '',
+          slots: EMPTY_TEAM,
+          isDraft: false,
         });
       },
     }),

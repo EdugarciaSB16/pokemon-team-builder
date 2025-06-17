@@ -2,9 +2,9 @@ import { useTeamStore } from '@/features/team/store';
 
 export default function PokemonActions({ pokemon }) {
   const addPokemon = useTeamStore((s) => s.addPokemon);
-  const team = useTeamStore((s) => s.team);
-  const isInTeam = team.some((p) => p?.id === pokemon.id);
-  const isTeamFull = team.filter(Boolean).length >= 6;
+  const slots = useTeamStore((s) => s.slots);
+  const isInTeam = slots.some((p) => p?.id === pokemon.id);
+  const isTeamFull = slots.filter(Boolean).length >= 6;
 
   const handleAddToTeam = () => {
     if (!isInTeam && !isTeamFull) {
