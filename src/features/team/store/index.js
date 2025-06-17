@@ -73,6 +73,32 @@ export const useTeamStore = create(
         });
       },
 
+      deleteTeam: (id) => {
+        const { savedTeams } = get();
+        set({ savedTeams: savedTeams.filter((team) => team.id !== id) });
+      },
+
+      editTeamName: (id, newName) => {
+        const { savedTeams } = get();
+        set({
+          savedTeams: savedTeams.map((team) =>
+            team.id === id ? { ...team, name: newName } : team
+          ),
+        });
+      },
+
+      duplicateTeam: (id) => {
+        const { savedTeams } = get();
+        const teamToDuplicate = savedTeams.find((team) => team.id === id);
+        if (!teamToDuplicate) return;
+        const duplicatedTeam = {
+          ...teamToDuplicate,
+          id: crypto.randomUUID(),
+          name: `${teamToDuplicate.name} (Copia)`,
+        };
+        set({ savedTeams: [...savedTeams, duplicatedTeam] });
+      },
+
       saveDraft: (name) => {
         set({ draftName: name || 'Borrador automático' });
       },
