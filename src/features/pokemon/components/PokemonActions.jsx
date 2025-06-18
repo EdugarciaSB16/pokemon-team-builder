@@ -1,4 +1,5 @@
 import { useTeamStore } from '@/features/team/store';
+import { Plus, Info } from 'lucide-react';
 
 export default function PokemonActions({ pokemon }) {
   const addPokemon = useTeamStore((s) => s.addPokemon);
@@ -13,16 +14,16 @@ export default function PokemonActions({ pokemon }) {
   };
 
   return (
-    <div className="flex justify-center gap-2 mt-2">
+    <div className="flex justify-between gap-2 mt-2">
       <button
         onClick={handleAddToTeam}
         disabled={isInTeam || isTeamFull}
-        className={`relative px-3 py-1.5 text-xs font-bold rounded-lg shadow-md transition-all duration-200 flex-1 flex items-center justify-center overflow-hidden ${
+        className={`w-1/2 px-3 py-1.5 text-xs font-bold rounded-lg border-2 shadow-md transition-all duration-200 flex items-center justify-center ${
           isInTeam
-            ? 'bg-green-100 text-green-800 border border-green-300 cursor-not-allowed'
+            ? 'bg-green-100 text-green-800 border-green-300 cursor-not-allowed'
             : isTeamFull
-            ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-            : 'bg-gradient-to-b from-yellow-400 to-yellow-500 text-gray-900 hover:from-yellow-300 hover:to-yellow-400 active:translate-y-0.5'
+            ? 'bg-gray-200 text-gray-500 border-gray-300 cursor-not-allowed'
+            : 'bg-gradient-to-b from-yellow-400 to-yellow-600 text-gray-900 border-yellow-700 hover:from-yellow-500 hover:to-yellow-700 active:translate-y-0.5'
         }`}
         title={
           isInTeam
@@ -32,27 +33,15 @@ export default function PokemonActions({ pokemon }) {
             : 'Add to team'
         }
       >
+        <Plus size={14} className="mr-1" />
         Add
       </button>
 
       <button
-        className="px-3 py-1.5 text-xs font-bold bg-gradient-to-b from-blue-100 to-blue-200 text-blue-800 rounded-lg shadow-md hover:from-blue-200 hover:to-blue-300 active:translate-y-0.5 transition-all duration-200 flex items-center justify-center"
+        className="w-1/2 px-3 py-1.5 text-xs font-bold bg-gradient-to-b from-blue-400 to-blue-600 text-white rounded-lg border-2 border-blue-700 shadow-md hover:from-blue-500 hover:to-blue-700 active:translate-y-0.5 transition-all duration-200 flex items-center justify-center"
         title="View details"
       >
-        <svg
-          className="w-3 h-3 mr-1"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
+        <Info size={14} className="mr-1" />
         Details
       </button>
     </div>
