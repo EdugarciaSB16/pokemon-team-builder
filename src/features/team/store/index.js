@@ -35,7 +35,15 @@ export const useTeamStore = create(
         newSlots[index] = EMPTY_SLOT;
         set({
           slots: newSlots,
-          isDraft: true,
+          isDraft: newSlots.some(Boolean),
+        });
+      },
+
+      // Clear all slots
+      clearTeam: () => {
+        set({
+          slots: EMPTY_TEAM,
+          isDraft: false,
         });
       },
 
@@ -86,7 +94,7 @@ export const useTeamStore = create(
       saveTeam: (name) => {
         const { slots, savedTeams } = get();
         const validTeam = slots.filter(Boolean);
-        if (validTeam.length === 0) return;
+        if (validTeam.length !== 6) return;
 
         const newTeam = {
           id: crypto.randomUUID(),
@@ -102,19 +110,19 @@ export const useTeamStore = create(
         });
       },
 
+      // Load a saved team
+      loadTeam: (team) => {
+        set({
+          slots: [...team.slots],
+          isDraft: false,
+        });
+      },
+
       // Delete a saved team
       deleteTeam: (id) => {
         const { savedTeams } = get();
         set({
           savedTeams: savedTeams.filter((team) => team.id !== id),
-        });
-      },
-
-      // Discard current draft
-      discardDraft: () => {
-        set({
-          slots: EMPTY_TEAM,
-          isDraft: false,
         });
       },
     }),

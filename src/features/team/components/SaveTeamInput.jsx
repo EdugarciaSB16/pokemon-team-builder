@@ -2,12 +2,15 @@ import { useEffect, useState } from 'react';
 import { useTeamActions } from '@/features/team/hooks/useTeamActions';
 
 export default function SaveTeamInput() {
-  const { saveTeam, isTeamEmpty } = useTeamActions();
+  const { saveTeam, team } = useTeamActions();
   const [name, setName] = useState('');
 
+  const isTeamComplete = team.every(Boolean);
+
   const handleSave = () => {
-    if (name.trim() && !isTeamEmpty) {
+    if (name.trim() && isTeamComplete) {
       saveTeam(name);
+      setName('');
       const saveBtn = document.getElementById('save-team-btn');
       if (saveBtn) {
         saveBtn.classList.add('animate-ping');
@@ -38,10 +41,17 @@ export default function SaveTeamInput() {
       <button
         id="save-team-btn"
         onClick={handleSave}
-        disabled={isTeamEmpty || !name.trim()}
+        disabled={!isTeamComplete || !name.trim()}
         className={`px-6 py-2 bg-gradient-to-b from-yellow-400 to-yellow-600 text-gray-900 text-sm font-bold rounded-lg border-2 border-yellow-700 shadow-md hover:from-yellow-300 hover:to-yellow-500 active:translate-y-0.5 transition-all duration-200 flex items-center justify-center min-w-[120px] ${
-          isTeamEmpty || !name.trim() ? 'opacity-50 cursor-not-allowed' : ''
+          !isTeamComplete || !name.trim() ? 'opacity-50 cursor-not-allowed' : ''
         }`}
+        title={
+          !isTeamComplete
+            ? 'Team must have 6 Pokémon'
+            : !name.trim()
+            ? 'Enter a team name'
+            : 'Save team'
+        }
       >
         <svg
           className="w-4 h-4 mr-1"
