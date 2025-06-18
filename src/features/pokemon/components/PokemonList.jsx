@@ -1,56 +1,35 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 import { usePokemonList } from '@/features/pokemon/hooks/usePokemonList';
-import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';
 import PokemonCard from './PokemonCard';
 
-export default function PokemonList() {
-  const [displayCount, setDisplayCount] = useState(30);
+export default function PokemonList({ filters }) {
   const {
     data: pokemons = [],
     isLoading,
     isError,
-  } = usePokemonList(displayCount);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const scrollPosition = useRef(0);
-  const prevPokemonsLength = useRef(0);
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+  } = usePokemonList(filters);
 
-  const saveScrollPosition = () => {
-    scrollPosition.current = window.scrollY;
-  };
-
-  const restoreScrollPosition = useCallback(() => {
-    if (pokemons.length > prevPokemonsLength.current) {
-      window.scrollTo(0, scrollPosition.current);
-    }
-    prevPokemonsLength.current = pokemons.length;
-  }, [pokemons.length]);
+  const observerTarget = useRef(null);
 
   useEffect(() => {
-    if (pokemons.length > 0) {
-      const timer = setTimeout(() => {
-        setIsLoadingMore(false);
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [pokemons]);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 }
+    );
 
-  useInfiniteScroll({
-    isLoading: isLoading || isLoadingMore,
-    onLoadMore: () => {
-      saveScrollPosition();
-      setIsLoadingMore(true);
-      setDisplayCount((prev) => prev + 30);
-    },
-  });
-
-  useEffect(() => {
-    if (!isLoading && !isLoadingMore) {
-      const timer = setTimeout(() => {
-        restoreScrollPosition();
-      }, 50);
-      return () => clearTimeout(timer);
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
     }
-  }, [isLoading, isLoadingMore, restoreScrollPosition]);
+
+    return () => observer.disconnect();
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   if (isLoading && (!pokemons || pokemons.length === 0)) {
     return (
@@ -81,7 +60,7 @@ export default function PokemonList() {
       <div className="text-center p-8">
         <div className="inline-block p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 rounded">
           <p>No Pokémon found.</p>
-          <p className="text-xs mt-2">Try a different search.</p>
+          <p className="text-xs mt-2">Try different filters.</p>
         </div>
       </div>
     );
@@ -97,11 +76,15 @@ export default function PokemonList() {
         )}
       </div>
 
-      {isLoadingMore && (
-        <div className="flex justify-center py-8">
+      {/* Intersection Observer Target */}
+      <div
+        ref={observerTarget}
+        className="h-10 w-full flex items-center justify-center"
+      >
+        {isFetchingNextPage && (
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-yellow-500"></div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
