@@ -1,5 +1,6 @@
 import { useTeamStore } from '@/features/team/store';
 import { useNavigate } from 'react-router-dom';
+import { Swords } from 'lucide-react';
 
 export default function FightButton() {
   const navigate = useNavigate();
@@ -20,19 +21,7 @@ export default function FightButton() {
         isDisabled ? 'Need at least 2 Pokémon to battle' : 'Go to battle screen'
       }
     >
-      <svg
-        className="w-4 h-4 mr-1"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M13 10V3L4 14h7v7l9-11h-7z"
-        />
-      </svg>
+      <Swords size={16} className="mr-1" />
       Fight!
     </button>
   );

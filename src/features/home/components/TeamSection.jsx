@@ -12,7 +12,7 @@ export default function TeamSection() {
     <section className="mb-8">
       <div className="p-6 bg-white/90 backdrop-blur-sm rounded-xl border-4 border-yellow-400 shadow-2xl mb-6">
         <div className="flex justify-between items-center mb-6">
-          <div className="w-32">{/* Espacio para balance visual */}</div>
+          <div className="w-32"></div>
           <h2 className="text-2xl font-bold text-gray-800 tracking-widest drop-shadow uppercase text-center flex-1">
             YOUR POKÉMON TEAM
           </h2>
