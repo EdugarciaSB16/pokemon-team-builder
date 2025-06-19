@@ -1,85 +1,43 @@
 // Battle service for handling battle logic and team generation
 export class BattleService {
-  // Popular Pokémon for random team generation
-  static POPULAR_POKEMON = [
-    {
-      id: 25,
-      name: 'pikachu',
-      stats: [
-        { stat: { name: 'attack' }, base_stat: 55 },
-        { stat: { name: 'defense' }, base_stat: 40 },
-        { stat: { name: 'speed' }, base_stat: 90 },
-      ],
-    },
-    {
-      id: 6,
-      name: 'charizard',
-      stats: [
-        { stat: { name: 'attack' }, base_stat: 84 },
-        { stat: { name: 'defense' }, base_stat: 78 },
-        { stat: { name: 'speed' }, base_stat: 100 },
-      ],
-    },
-    {
-      id: 9,
-      name: 'blastoise',
-      stats: [
-        { stat: { name: 'attack' }, base_stat: 83 },
-        { stat: { name: 'defense' }, base_stat: 100 },
-        { stat: { name: 'speed' }, base_stat: 78 },
-      ],
-    },
-    {
-      id: 150,
-      name: 'mewtwo',
-      stats: [
-        { stat: { name: 'attack' }, base_stat: 110 },
-        { stat: { name: 'defense' }, base_stat: 90 },
-        { stat: { name: 'speed' }, base_stat: 130 },
-      ],
-    },
-    {
-      id: 149,
-      name: 'dragonite',
-      stats: [
-        { stat: { name: 'attack' }, base_stat: 134 },
-        { stat: { name: 'defense' }, base_stat: 95 },
-        { stat: { name: 'speed' }, base_stat: 80 },
-      ],
-    },
-    {
-      id: 3,
-      name: 'venusaur',
-      stats: [
-        { stat: { name: 'attack' }, base_stat: 82 },
-        { stat: { name: 'defense' }, base_stat: 83 },
-        { stat: { name: 'speed' }, base_stat: 80 },
-      ],
-    },
-    {
-      id: 59,
-      name: 'arcanine',
-      stats: [
-        { stat: { name: 'attack' }, base_stat: 110 },
-        { stat: { name: 'defense' }, base_stat: 80 },
-        { stat: { name: 'speed' }, base_stat: 95 },
-      ],
-    },
-    {
-      id: 130,
-      name: 'gyarados',
-      stats: [
-        { stat: { name: 'attack' }, base_stat: 125 },
-        { stat: { name: 'defense' }, base_stat: 79 },
-        { stat: { name: 'speed' }, base_stat: 81 },
-      ],
-    },
-  ];
+  // Generate a random team using PokeAPI
+  static async generateRandomTeamFromAPI() {
+    try {
+      // Get total number of Pokemon (up to 1008)
+      const totalPokemon = 1008;
 
-  // Generate a random team
-  static generateRandomTeam() {
-    const shuffled = [...this.POPULAR_POKEMON].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, 6);
+      // Generate 6 random IDs between 1 and totalPokemon
+      const randomIds = [];
+      while (randomIds.length < 6) {
+        const randomId = Math.floor(Math.random() * totalPokemon) + 1;
+        if (!randomIds.includes(randomId)) {
+          randomIds.push(randomId);
+        }
+      }
+
+      // Fetch Pokemon data for each random ID
+      const pokemonPromises = randomIds.map(async (id) => {
+        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch Pokemon ${id}`);
+        }
+        return response.json();
+      });
+
+      const pokemonData = await Promise.all(pokemonPromises);
+
+      // Transform the data to match the expected format
+      return pokemonData.map((pokemon) => ({
+        id: pokemon.id,
+        name: pokemon.name,
+        sprites: pokemon.sprites,
+        types: pokemon.types,
+        stats: pokemon.stats,
+      }));
+    } catch (error) {
+      console.error('Error generating random team from API:', error);
+      throw error;
+    }
   }
 
   // Get Pokémon stats
@@ -87,112 +45,7 @@ export class BattleService {
     return pokemon.stats.find((s) => s.stat.name === statName)?.base_stat || 0;
   }
 
-  // Simulate a single round battle
-  static simulateRound(round, team1, team2) {
-    const pokemon1 = team1[round];
-    const pokemon2 = team2[round];
-
-    // Handle missing Pokémon
-    if (!pokemon1 || !pokemon2) {
-      return {
-        round: round + 1,
-        pokemon1: pokemon1?.name || 'None',
-        pokemon2: pokemon2?.name || 'None',
-        winner: pokemon1 ? 'Team 1' : 'Team 2',
-        reason: 'No opponent',
-        pokemon1Stats: pokemon1
-          ? {
-              attack: this.getPokemonStats(pokemon1, 'attack'),
-              defense: this.getPokemonStats(pokemon1, 'defense'),
-              speed: this.getPokemonStats(pokemon1, 'speed'),
-            }
-          : null,
-        pokemon2Stats: pokemon2
-          ? {
-              attack: this.getPokemonStats(pokemon2, 'attack'),
-              defense: this.getPokemonStats(pokemon2, 'defense'),
-              speed: this.getPokemonStats(pokemon2, 'speed'),
-            }
-          : null,
-      };
-    }
-
-    const speed1 = this.getPokemonStats(pokemon1, 'speed');
-    const speed2 = this.getPokemonStats(pokemon2, 'speed');
-    const attack1 = this.getPokemonStats(pokemon1, 'attack');
-    const attack2 = this.getPokemonStats(pokemon2, 'attack');
-    const defense1 = this.getPokemonStats(pokemon1, 'defense');
-    const defense2 = this.getPokemonStats(pokemon2, 'defense');
-
-    // Faster Pokémon attacks first
-    if (speed1 > speed2) {
-      if (attack1 > defense2) {
-        return {
-          round: round + 1,
-          pokemon1: pokemon1.name,
-          pokemon2: pokemon2.name,
-          winner: 'Team 1',
-          reason: `${pokemon1.name} defeated ${pokemon2.name} with superior attack`,
-          pokemon1Stats: { attack: attack1, defense: defense1, speed: speed1 },
-          pokemon2Stats: { attack: attack2, defense: defense2, speed: speed2 },
-        };
-      } else if (attack2 > defense1) {
-        return {
-          round: round + 1,
-          pokemon1: pokemon1.name,
-          pokemon2: pokemon2.name,
-          winner: 'Team 2',
-          reason: `${pokemon2.name} defeated ${pokemon1.name} with superior attack`,
-          pokemon1Stats: { attack: attack1, defense: defense1, speed: speed1 },
-          pokemon2Stats: { attack: attack2, defense: defense2, speed: speed2 },
-        };
-      } else {
-        return {
-          round: round + 1,
-          pokemon1: pokemon1.name,
-          pokemon2: pokemon2.name,
-          winner: 'Team 1',
-          reason: `${pokemon1.name} wins due to higher speed`,
-          pokemon1Stats: { attack: attack1, defense: defense1, speed: speed1 },
-          pokemon2Stats: { attack: attack2, defense: defense2, speed: speed2 },
-        };
-      }
-    } else {
-      if (attack2 > defense1) {
-        return {
-          round: round + 1,
-          pokemon1: pokemon1.name,
-          pokemon2: pokemon2.name,
-          winner: 'Team 2',
-          reason: `${pokemon2.name} defeated ${pokemon1.name} with superior attack`,
-          pokemon1Stats: { attack: attack1, defense: defense1, speed: speed1 },
-          pokemon2Stats: { attack: attack2, defense: defense2, speed: speed2 },
-        };
-      } else if (attack1 > defense2) {
-        return {
-          round: round + 1,
-          pokemon1: pokemon1.name,
-          pokemon2: pokemon2.name,
-          winner: 'Team 1',
-          reason: `${pokemon1.name} defeated ${pokemon2.name} with superior attack`,
-          pokemon1Stats: { attack: attack1, defense: defense1, speed: speed1 },
-          pokemon2Stats: { attack: attack2, defense: defense2, speed: speed2 },
-        };
-      } else {
-        return {
-          round: round + 1,
-          pokemon1: pokemon1.name,
-          pokemon2: pokemon2.name,
-          winner: 'Team 2',
-          reason: `${pokemon2.name} wins due to higher speed`,
-          pokemon1Stats: { attack: attack1, defense: defense1, speed: speed1 },
-          pokemon2Stats: { attack: attack2, defense: defense2, speed: speed2 },
-        };
-      }
-    }
-  }
-
-  // Calculate final battle results
+  // Calculate final battle results (not used in UI, but kept for possible summary)
   static calculateFinalResults(battleResults, team1, team2) {
     const team1Wins = battleResults.filter((r) => r.winner === 'Team 1').length;
     const team2Wins = battleResults.filter((r) => r.winner === 'Team 2').length;
@@ -210,6 +63,104 @@ export class BattleService {
           : team2Wins > team1Wins
           ? 'Team 2'
           : 'Tie',
+    };
+  }
+
+  // Main battle logic: winner keeps fighting
+  static simulateFullBattle(team1, team2) {
+    let a = 0;
+    let b = 0;
+    const hpA = Array(team1.length).fill(100);
+    const hpB = Array(team2.length).fill(100);
+    const rounds = [];
+    while (a < team1.length && b < team2.length) {
+      const pokeA = team1[a];
+      const pokeB = team2[b];
+      const atkA = this.getPokemonStats(pokeA, 'attack');
+      const defA = this.getPokemonStats(pokeA, 'defense');
+      const spdA = this.getPokemonStats(pokeA, 'speed');
+      const atkB = this.getPokemonStats(pokeB, 'attack');
+      const defB = this.getPokemonStats(pokeB, 'defense');
+      const spdB = this.getPokemonStats(pokeB, 'speed');
+      let first = spdA > spdB ? 'A' : spdB > spdA ? 'B' : 'A';
+      let winner = null;
+      let loser = null;
+      let message = '';
+      if (first === 'A') {
+        if (atkA > defB) {
+          hpB[b] = 0;
+          winner = 'A';
+          loser = 'B';
+          message = `${pokeA.name} defeated ${pokeB.name} with superior attack`;
+        } else if (atkB > defA) {
+          hpA[a] = 0;
+          winner = 'B';
+          loser = 'A';
+          message = `${pokeB.name} defeated ${pokeA.name} with superior attack`;
+        } else {
+          if (spdA >= spdB) {
+            hpB[b] = 0;
+            winner = 'A';
+            loser = 'B';
+            message = `${pokeA.name} wins due to higher speed`;
+          } else {
+            hpA[a] = 0;
+            winner = 'B';
+            loser = 'A';
+            message = `${pokeB.name} wins due to higher speed`;
+          }
+        }
+      } else {
+        if (atkB > defA) {
+          hpA[a] = 0;
+          winner = 'B';
+          loser = 'A';
+          message = `${pokeB.name} defeated ${pokeA.name} with superior attack`;
+        } else if (atkA > defB) {
+          hpB[b] = 0;
+          winner = 'A';
+          loser = 'B';
+          message = `${pokeA.name} defeated ${pokeB.name} with superior attack`;
+        } else {
+          if (spdB >= spdA) {
+            hpA[a] = 0;
+            winner = 'B';
+            loser = 'A';
+            message = `${pokeB.name} wins due to higher speed`;
+          } else {
+            hpB[b] = 0;
+            winner = 'A';
+            loser = 'B';
+            message = `${pokeA.name} wins due to higher speed`;
+          }
+        }
+      }
+      rounds.push({
+        round: rounds.length + 1,
+        pokemonA: pokeA,
+        pokemonB: pokeB,
+        winner,
+        loser,
+        message,
+        hpA: [...hpA],
+        hpB: [...hpB],
+        a,
+        b,
+      });
+      if (winner === 'A') {
+        b++;
+      } else {
+        a++;
+      }
+    }
+    return {
+      rounds,
+      hpA,
+      hpB,
+      survivorsA: hpA.filter((hp) => hp > 0).length,
+      survivorsB: hpB.filter((hp) => hp > 0).length,
+      defeatedA: hpA.filter((hp) => hp === 0).length,
+      defeatedB: hpB.filter((hp) => hp === 0).length,
     };
   }
 }
