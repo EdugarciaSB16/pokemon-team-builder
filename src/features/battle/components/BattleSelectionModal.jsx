@@ -15,7 +15,10 @@ export default function BattleSelectionModal({ onClose }) {
   const currentTeam = getCurrentTeamForBattle();
 
   const handleStartBattle = async () => {
-    if (!currentTeam) return;
+    if (!currentTeam) {
+      console.log('No current team found');
+      return;
+    }
 
     setIsLoading(true);
 
@@ -34,6 +37,8 @@ export default function BattleSelectionModal({ onClose }) {
           savedTeams.find((t) => t.id === selectedTeam2Id)?.name || 'Team 2';
       }
 
+      BattleService.cleanupBattleData();
+
       const battleData = {
         team1: currentTeam.pokemons,
         team2: team2,
@@ -43,8 +48,24 @@ export default function BattleSelectionModal({ onClose }) {
         team2Id: selectedTeam2 === 'random' ? 'random' : selectedTeam2Id,
       };
 
-      localStorage.setItem('battle-data', JSON.stringify(battleData));
-      navigate('/battle');
+      try {
+        localStorage.setItem('battle-data', JSON.stringify(battleData));
+        navigate('/battle', { state: { battleData } });
+      } catch (storageError) {
+        console.error('Error saving to localStorage:', storageError);
+        BattleService.cleanupBattleData();
+        const minimalBattleData = {
+          team1: currentTeam.pokemons.map((p) => ({ id: p.id, name: p.name })),
+          team2: team2.map((p) => ({ id: p.id, name: p.name })),
+          team1Name: currentTeam.name,
+          team2Name: team2Name,
+          team1Id: currentTeam.id,
+          team2Id: selectedTeam2 === 'random' ? 'random' : selectedTeam2Id,
+        };
+        localStorage.setItem('battle-data', JSON.stringify(minimalBattleData));
+        console.log('Minimal battle data saved');
+        navigate('/battle', { state: { battleData: minimalBattleData } });
+      }
     } catch (error) {
       console.error('Error starting battle:', error);
     } finally {

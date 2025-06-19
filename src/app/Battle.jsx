@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { BattleService } from '@/features/battle/services/battleService';
 import { ArrowLeft, Swords, Shield, Trophy, Users } from 'lucide-react';
 import PokemonImage from '@/features/pokemon/components/PokemonImage';
 
 export default function Battle() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [battleData, setBattleData] = useState(null);
   const [currentRound, setCurrentRound] = useState(0);
   const [battleRounds, setBattleRounds] = useState([]);
@@ -17,18 +18,36 @@ export default function Battle() {
     battleText: '',
   });
 
-  // Load battle data only if not in memory
+  // Load battle data from navigation state or localStorage
   useEffect(() => {
     if (!battleData) {
+      if (location.state?.battleData) {
+        setBattleData(location.state.battleData);
+        return;
+      }
+
       const data = localStorage.getItem('battle-data');
       if (!data) {
         navigate('/');
         return;
       }
-      const parsedData = JSON.parse(data);
-      setBattleData(parsedData);
+
+      try {
+        const parsedData = JSON.parse(data);
+        setBattleData(parsedData);
+      } catch (parseError) {
+        console.error('Error parsing battle data:', parseError);
+        navigate('/');
+      }
     }
-  }, [navigate, battleData]);
+  }, [navigate, battleData, location.state]);
+
+  // Cleanup battle data on unmount
+  useEffect(() => {
+    return () => {
+      BattleService.cleanupBattleData();
+    };
+  }, []);
 
   // Get Pokemon image URL
   const getPokemonImage = (pokemon) => {

@@ -26,17 +26,37 @@ export class BattleService {
 
       const pokemonData = await Promise.all(pokemonPromises);
 
-      // Transform the data to match the expected format
+      // Transform the data to match the expected format, keeping only essential data
       return pokemonData.map((pokemon) => ({
         id: pokemon.id,
         name: pokemon.name,
-        sprites: pokemon.sprites,
-        types: pokemon.types,
-        stats: pokemon.stats,
+        sprites: {
+          front_default: pokemon.sprites.front_default,
+          other: {
+            'official-artwork': {
+              front_default:
+                pokemon.sprites.other?.['official-artwork']?.front_default,
+            },
+          },
+        },
+        types: pokemon.types.map((t) => ({ type: { name: t.type.name } })),
+        stats: pokemon.stats.map((s) => ({
+          base_stat: s.base_stat,
+          stat: { name: s.stat.name },
+        })),
       }));
     } catch (error) {
       console.error('Error generating random team from API:', error);
       throw error;
+    }
+  }
+
+  // Clean up battle data from localStorage
+  static cleanupBattleData() {
+    try {
+      localStorage.removeItem('battle-data');
+    } catch (error) {
+      console.error('Error cleaning up battle data:', error);
     }
   }
 

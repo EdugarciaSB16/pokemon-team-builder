@@ -4,18 +4,33 @@ import { persist } from 'zustand/middleware';
 const EMPTY_SLOT = null;
 const EMPTY_TEAM = Array(6).fill(EMPTY_SLOT);
 
+// Helper function to clean Pokemon data before storage
+const cleanPokemonData = (pokemon) => ({
+  id: pokemon.id,
+  name: pokemon.name,
+  sprites: {
+    front_default: pokemon.sprites.front_default,
+    other: {
+      'official-artwork': {
+        front_default:
+          pokemon.sprites.other?.['official-artwork']?.front_default,
+      },
+    },
+  },
+  types: pokemon.types.map((t) => ({ type: { name: t.type.name } })),
+  stats: pokemon.stats.map((s) => ({
+    base_stat: s.base_stat,
+    stat: { name: s.stat.name },
+  })),
+});
+
 export const useTeamStore = create(
   persist(
     (set, get) => ({
-      // Current team in slots
       slots: EMPTY_TEAM,
-      // Saved teams
       savedTeams: [],
-      // Draft state
       isDraft: false,
-      // Current loaded team (for battle validation)
       currentLoadedTeam: null,
-      // Notification state
       notification: null,
 
       // Add pokemon to first empty slot
@@ -25,7 +40,7 @@ export const useTeamStore = create(
         if (index === -1) return;
 
         const newSlots = [...slots];
-        newSlots[index] = pokemon;
+        newSlots[index] = cleanPokemonData(pokemon);
         set({
           slots: newSlots,
           isDraft: true,
