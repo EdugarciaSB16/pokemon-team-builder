@@ -3,42 +3,58 @@ import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useTeamStore } from '@/features/team/store';
 import { BattleService } from '@/features/battle/services/battleService';
-import { X, Users, Zap, Play, Shield } from 'lucide-react';
+import { X, Users, Zap, Play, Shield, Loader2 } from 'lucide-react';
 
 export default function BattleSelectionModal({ onClose }) {
   const navigate = useNavigate();
   const { savedTeams, getCurrentTeamForBattle } = useTeamStore();
   const [selectedTeam2, setSelectedTeam2] = useState('random');
   const [selectedTeam2Id, setSelectedTeam2Id] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const currentTeam = getCurrentTeamForBattle();
 
-  const handleStartBattle = () => {
+  const handleStartBattle = async () => {
     if (!currentTeam) return;
-    const team2 =
-      selectedTeam2 === 'random'
-        ? BattleService.generateRandomTeam()
-        : savedTeams
+
+    setIsLoading(true);
+
+    try {
+      let team2, team2Name;
+
+      if (selectedTeam2 === 'random') {
+        team2 = await BattleService.generateRandomTeamFromAPI();
+        team2Name = 'Random Team';
+      } else {
+        team2 =
+          savedTeams
             .find((t) => t.id === selectedTeam2Id)
             ?.slots.filter(Boolean) || [];
-    const team2Name =
-      selectedTeam2 === 'random'
-        ? 'Random Team'
-        : savedTeams.find((t) => t.id === selectedTeam2Id)?.name || 'Team 2';
-    const battleData = {
-      team1: currentTeam.pokemons,
-      team2: team2,
-      team1Name: currentTeam.name,
-      team2Name: team2Name,
-      team1Id: currentTeam.id,
-      team2Id: selectedTeam2 === 'random' ? 'random' : selectedTeam2Id,
-    };
-    localStorage.setItem('battle-data', JSON.stringify(battleData));
-    navigate('/battle');
+        team2Name =
+          savedTeams.find((t) => t.id === selectedTeam2Id)?.name || 'Team 2';
+      }
+
+      const battleData = {
+        team1: currentTeam.pokemons,
+        team2: team2,
+        team1Name: currentTeam.name,
+        team2Name: team2Name,
+        team1Id: currentTeam.id,
+        team2Id: selectedTeam2 === 'random' ? 'random' : selectedTeam2Id,
+      };
+
+      localStorage.setItem('battle-data', JSON.stringify(battleData));
+      navigate('/battle');
+    } catch (error) {
+      console.error('Error starting battle:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const canStartBattle =
     currentTeam &&
+    !isLoading &&
     (selectedTeam2 === 'random' ||
       (selectedTeam2 === 'saved' &&
         selectedTeam2Id &&
@@ -55,6 +71,7 @@ export default function BattleSelectionModal({ onClose }) {
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
+            disabled={isLoading}
           >
             <X size={24} />
           </button>
@@ -98,11 +115,17 @@ export default function BattleSelectionModal({ onClose }) {
                   checked={selectedTeam2 === 'random'}
                   onChange={(e) => setSelectedTeam2(e.target.value)}
                   className="mr-3"
+                  disabled={isLoading}
                 />
                 <div>
-                  <div className="font-medium">Random Team</div>
+                  <div className="font-medium flex items-center">
+                    Random Team
+                    {isLoading && selectedTeam2 === 'random' && (
+                      <Loader2 size={16} className="ml-2 animate-spin" />
+                    )}
+                  </div>
                   <div className="text-sm text-gray-600">
-                    Battle against a computer-generated team
+                    Battle against a computer-generated team from all Pokémon
                   </div>
                 </div>
               </label>
@@ -125,6 +148,7 @@ export default function BattleSelectionModal({ onClose }) {
                         setSelectedTeam2Id(team.id);
                       }}
                       className="mr-3"
+                      disabled={isLoading}
                     />
                     <div>
                       <div className="font-medium">{team.name}</div>
@@ -153,8 +177,17 @@ export default function BattleSelectionModal({ onClose }) {
                 : 'bg-gray-300 text-gray-500 border-gray-400 cursor-not-allowed'
             }`}
           >
-            <Play size={20} className="mr-2" />
-            Start Battle!
+            {isLoading ? (
+              <>
+                <Loader2 size={20} className="mr-2 animate-spin" />
+                Generating Team...
+              </>
+            ) : (
+              <>
+                <Play size={20} className="mr-2" />
+                Start Battle!
+              </>
+            )}
           </button>
         </div>
       </div>
