@@ -1,21 +1,23 @@
 import { useEffect, useState } from 'react';
-import { useTeamActions } from '@/features/team/hooks/useTeamActions';
+import { useTeamStore } from '@/features/team/store';
 import { Save } from 'lucide-react';
 
 export default function SaveTeamInput() {
-  const { saveTeam, team } = useTeamActions();
+  const { slots, saveTeam } = useTeamStore();
   const [name, setName] = useState('');
 
-  const isTeamComplete = team.every(Boolean);
+  const isTeamComplete = slots.filter(Boolean).length === 6;
 
   const handleSave = () => {
     if (name.trim() && isTeamComplete) {
-      saveTeam(name);
-      setName('');
-      const saveBtn = document.getElementById('save-team-btn');
-      if (saveBtn) {
-        saveBtn.classList.add('animate-ping');
-        setTimeout(() => saveBtn.classList.remove('animate-ping'), 300);
+      const success = saveTeam(name);
+      if (success) {
+        setName('');
+        const saveBtn = document.getElementById('save-team-btn');
+        if (saveBtn) {
+          saveBtn.classList.add('animate-ping');
+          setTimeout(() => saveBtn.classList.remove('animate-ping'), 300);
+        }
       }
     }
   };
