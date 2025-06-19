@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTeamStore } from '@/features/team/store';
-import { Archive } from 'lucide-react';
+import { Archive, X, Download, Trash2 } from 'lucide-react';
 
 export default function SavedTeamsButton() {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,19 +28,7 @@ export default function SavedTeamsButton() {
                 onClick={() => setIsOpen(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
+                <X size={24} />
               </button>
             </div>
 
@@ -62,6 +50,9 @@ export default function SavedTeamsButton() {
                           Created:{' '}
                           {new Date(team.createdAt).toLocaleDateString()}
                         </p>
+                        <p className="text-xs text-gray-500">
+                          Pokémon: {team.slots.filter(Boolean).length}/6
+                        </p>
                       </div>
                       <div className="flex gap-2">
                         <button
@@ -69,14 +60,16 @@ export default function SavedTeamsButton() {
                             loadTeam(team);
                             setIsOpen(false);
                           }}
-                          className="px-3 py-1.5 bg-gradient-to-b from-blue-400 to-blue-600 text-white rounded-lg hover:from-blue-500 hover:to-blue-700 text-sm font-medium border border-blue-700 transition-all duration-200"
+                          className="px-3 py-1.5 bg-gradient-to-b from-blue-400 to-blue-600 text-white rounded-lg hover:from-blue-500 hover:to-blue-700 text-sm font-medium border border-blue-700 transition-all duration-200 flex items-center gap-1"
                         >
+                          <Download size={14} />
                           Load
                         </button>
                         <button
                           onClick={() => deleteTeam(team.id)}
-                          className="px-3 py-1.5 bg-gradient-to-b from-red-400 to-red-600 text-white rounded-lg hover:from-red-500 hover:to-red-700 text-sm font-medium border border-red-700 transition-all duration-200"
+                          className="px-3 py-1.5 bg-gradient-to-b from-red-400 to-red-600 text-white rounded-lg hover:from-red-500 hover:to-red-700 text-sm font-medium border border-red-700 transition-all duration-200 flex items-center gap-1"
                         >
+                          <Trash2 size={14} />
                           Delete
                         </button>
                       </div>
