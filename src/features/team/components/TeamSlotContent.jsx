@@ -13,25 +13,24 @@ export default function TeamSlotContent({
     const spd = pokemon.stats?.find((s) => s.stat.name === 'speed')?.base_stat;
     return (
       <div className="relative z-10 w-full h-full flex flex-col items-center justify-between p-2 transition-all duration-300">
-        <div className="relative w-24 h-24 flex items-center justify-center mb-2">
-          <img
-            src={pokemon.sprites.front_default}
-            alt={pokemon.name}
-            className="max-w-full max-h-full object-contain drop-shadow-md"
-          />
-          {onRemove && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onRemove();
-              }}
-              className="absolute -top-1 -right-1 w-6 h-6 flex items-center justify-center bg-red-500 text-white text-sm rounded-full hover:bg-red-600 shadow-lg border-2 border-white transition-colors"
-              title="Remove"
-            >
-              ×
-            </button>
-          )}
-        </div>
+        <img
+          src={pokemon.sprites.front_default}
+          alt={pokemon.name}
+          className="max-w-full max-h-full object-contain drop-shadow-md"
+        />
+        {onRemove && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove();
+            }}
+            className="absolute top-2 right-3 w-6 h-6 flex items-center justify-center bg-red-500 text-white text-sm rounded-full hover:bg-red-600 shadow-lg border-2 border-white transition-colors"
+            title="Remove"
+          >
+            ×
+          </button>
+        )}
+        <div className="relative w-24 h-24 flex items-center justify-center mb-2"></div>
         <div className="w-full px-2 py-1 bg-black/70 rounded-md text-center mb-1">
           <p className="text-base font-bold text-white capitalize truncate">
             {pokemon.name}
@@ -67,7 +66,7 @@ export default function TeamSlotContent({
               e.stopPropagation();
               onRemove();
             }}
-            className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center bg-red-500 text-white text-sm rounded-full hover:bg-red-600 shadow-lg border-2 border-white transition-colors"
+            className="absolute -right-1 w-5 h-5 flex items-center justify-center bg-red-500 text-white text-sm rounded-full hover:bg-red-600 shadow-lg border-2 border-white transition-colors"
             title="Remove"
           >
             ×
