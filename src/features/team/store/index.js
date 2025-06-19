@@ -13,6 +13,10 @@ export const useTeamStore = create(
       savedTeams: [],
       // Draft state
       isDraft: false,
+      // Current loaded team (for battle validation)
+      currentLoadedTeam: null,
+      // Notification state
+      notification: null,
 
       // Add pokemon to first empty slot
       addPokemon: (pokemon) => {
@@ -25,6 +29,7 @@ export const useTeamStore = create(
         set({
           slots: newSlots,
           isDraft: true,
+          currentLoadedTeam: null,
         });
       },
 
@@ -36,6 +41,7 @@ export const useTeamStore = create(
         set({
           slots: newSlots,
           isDraft: newSlots.some(Boolean),
+          currentLoadedTeam: null,
         });
       },
 
@@ -44,6 +50,7 @@ export const useTeamStore = create(
         set({
           slots: EMPTY_TEAM,
           isDraft: false,
+          currentLoadedTeam: null,
         });
       },
 
@@ -52,6 +59,7 @@ export const useTeamStore = create(
         set({
           slots: newOrder,
           isDraft: true,
+          currentLoadedTeam: null,
         }),
 
       // Randomize team order
@@ -66,6 +74,7 @@ export const useTeamStore = create(
         set({
           slots: newSlots,
           isDraft: true,
+          currentLoadedTeam: null,
         });
       },
 
@@ -87,6 +96,7 @@ export const useTeamStore = create(
         set({
           slots: newSlots,
           isDraft: true,
+          currentLoadedTeam: null,
         });
       },
 
@@ -94,7 +104,7 @@ export const useTeamStore = create(
       saveTeam: (name) => {
         const { slots, savedTeams } = get();
         const validTeam = slots.filter(Boolean);
-        if (validTeam.length !== 6) return;
+        if (validTeam.length !== 6) return false;
 
         const newTeam = {
           id: crypto.randomUUID(),
@@ -105,25 +115,66 @@ export const useTeamStore = create(
 
         set({
           savedTeams: [...savedTeams, newTeam],
-          slots: EMPTY_TEAM,
+          currentLoadedTeam: newTeam,
           isDraft: false,
+          notification: {
+            type: 'success',
+            message: `Team "${newTeam.name}" saved successfully! Ready to battle!`,
+            duration: 3000,
+          },
         });
+
+        return true;
       },
 
       // Load a saved team
       loadTeam: (team) => {
         set({
           slots: [...team.slots],
+          currentLoadedTeam: team,
           isDraft: false,
+          notification: {
+            type: 'info',
+            message: `Team "${team.name}" loaded! Ready to battle!`,
+            duration: 3000,
+          },
         });
       },
 
       // Delete a saved team
       deleteTeam: (id) => {
-        const { savedTeams } = get();
+        const { savedTeams, currentLoadedTeam } = get();
+        const newSavedTeams = savedTeams.filter((team) => team.id !== id);
+
         set({
-          savedTeams: savedTeams.filter((team) => team.id !== id),
+          savedTeams: newSavedTeams,
+          // Clear current loaded team if it was deleted
+          currentLoadedTeam:
+            currentLoadedTeam?.id === id ? null : currentLoadedTeam,
         });
+      },
+
+      // Clear notification
+      clearNotification: () => {
+        set({ notification: null });
+      },
+
+      // Check if current team is ready for battle
+      isTeamReadyForBattle: () => {
+        const { slots, currentLoadedTeam } = get();
+        const filledSlots = slots.filter(Boolean).length;
+        return filledSlots === 6 && currentLoadedTeam !== null;
+      },
+
+      // Get current team for battle
+      getCurrentTeamForBattle: () => {
+        const { slots, currentLoadedTeam } = get();
+        if (!currentLoadedTeam) return null;
+        return {
+          id: currentLoadedTeam.id,
+          name: currentLoadedTeam.name,
+          pokemons: slots.filter(Boolean),
+        };
       },
     }),
     {
