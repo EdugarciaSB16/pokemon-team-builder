@@ -107,3 +107,7 @@
     @apply absolute inset-0 border-4 border-white rounded pointer-events-none;
   }
 }
+
+button {
+  @apply cursor-pointer;
+}
