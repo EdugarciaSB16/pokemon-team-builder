@@ -22,6 +22,7 @@ export default function Battle() {
   const [battleData, setBattleData] = useState(null);
   const [currentRound, setCurrentRound] = useState(0);
   const [battleRounds, setBattleRounds] = useState([]);
+  const [displayedBattleRounds, setDisplayedBattleRounds] = useState([]);
   const [isComplete, setIsComplete] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [faintedPokemonA, setFaintedPokemonA] = useState(new Set());
@@ -186,6 +187,7 @@ export default function Battle() {
       }));
       await new Promise((res) => setTimeout(res, 1000));
 
+      setDisplayedBattleRounds((prev) => [...prev, round]);
       setCurrentRound((r) => r + 1);
     };
     animate();
@@ -463,7 +465,7 @@ export default function Battle() {
               Battle History
             </h2>
             <div className="space-y-3 max-h-[40vh] lg:max-h-[600px] overflow-y-auto pr-2">
-              {battleRounds.map((result, index) => (
+              {displayedBattleRounds.map((result, index) => (
                 <div
                   key={index}
                   className={`p-4 rounded-lg text-sm transition-all duration-200 ${
