@@ -229,98 +229,24 @@ export default function Battle() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="relative bg-gradient-to-br from-green-100 via-emerald-100 to-teal-100 rounded-2xl shadow-2xl p-8 mb-8 min-h-[600px] overflow-hidden border-4 border-green-200">
+        <div className="relative flex flex-col lg:block bg-gradient-to-br from-green-100 via-emerald-100 to-teal-100 rounded-2xl shadow-2xl p-4 md:p-8 mb-8 min-h-[600px] overflow-hidden border-4 border-green-200">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-green-200/20"></div>
           <div className="absolute top-4 left-4 w-16 h-16 bg-yellow-400/20 rounded-full"></div>
           <div className="absolute top-8 right-8 w-12 h-12 bg-blue-400/20 rounded-full"></div>
           <div className="absolute bottom-8 left-8 w-20 h-20 bg-red-400/20 rounded-full"></div>
-          <div className="absolute bottom-8 left-8 w-80">
-            {pokeA && (
-              <div
-                className={`transition-all duration-500 ${
-                  battleState.currentAnimation === 'attack' &&
-                  battleState.battleText.includes(pokeA.name)
-                    ? 'translate-x-16'
-                    : ''
-                }`}
-              >
-                <div className="bg-white/95 backdrop-blur-sm rounded-xl p-4 mb-4 shadow-xl border-2 border-red-200">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="font-bold text-lg capitalize text-red-700">
-                      {pokeA.name}
-                    </span>
-                    <span className="text-sm bg-red-100 text-red-700 px-2 py-1 rounded-full font-medium">
-                      Lv. 50
-                    </span>
-                  </div>
-                  <div className="mb-3">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium text-gray-600">
-                        HP
-                      </span>
-                      <span className="text-sm font-bold">
-                        {battleState.pokemonAHP}/100
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3 shadow-inner">
-                      <div
-                        className="h-full rounded-full transition-all duration-1000 bg-gradient-to-r from-green-500 to-emerald-400 shadow-lg"
-                        style={{ width: `${battleState.pokemonAHP}%` }}
-                      />
-                    </div>
-                  </div>
-                  {statsA && (
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div className="flex items-center gap-1">
-                        <Heart size={12} className="text-red-500" />
-                        <span className="font-medium">HP:</span>
-                        <span className="text-gray-600">{statsA.hp}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Target size={12} className="text-orange-500" />
-                        <span className="font-medium">ATK:</span>
-                        <span className="text-gray-600">{statsA.attack}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <ShieldIcon size={12} className="text-blue-500" />
-                        <span className="font-medium">DEF:</span>
-                        <span className="text-gray-600">{statsA.defense}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Zap size={12} className="text-yellow-500" />
-                        <span className="font-medium">SPD:</span>
-                        <span className="text-gray-600">{statsA.speed}</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <div className="relative w-64 h-64">
-                  <div className="absolute inset-0 bg-gradient-to-br from-red-100 to-red-200 rounded-full opacity-50"></div>
-                  <PokemonImage
-                    src={getPokemonImage(pokeA)}
-                    alt={pokeA.name}
-                    className={`w-full h-full object-contain transform scale-x-[-1] transition-all duration-300 ${
-                      battleState.currentAnimation === 'damage' &&
-                      battleState.battleText.includes(pokeA.name)
-                        ? 'animate-shake scale-110'
-                        : ''
-                    }`}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-          <div className="absolute top-8 right-8 w-80">
+
+          {/* Opponent Pokemon (Top on mobile, right on desktop) */}
+          <div className="relative lg:absolute lg:top-8 lg:right-8 w-full lg:w-80 mx-auto order-1">
             {pokeB && (
               <div
-                className={`transition-all duration-500 ${
+                className={`transition-all duration-500 mx-auto w-full max-w-sm lg:max-w-none ${
                   battleState.currentAnimation === 'attack' &&
                   battleState.battleText.includes(pokeB.name)
-                    ? '-translate-x-16'
+                    ? 'lg:-translate-x-16'
                     : ''
                 }`}
               >
-                <div className="bg-white/95 backdrop-blur-sm rounded-xl p-4 mb-4 shadow-xl border-2 border-blue-200">
+                <div className="bg-white/95 backdrop-blur-sm rounded-xl p-3 md:p-4 mb-4 shadow-xl border-2 border-blue-200">
                   <div className="flex items-center justify-between mb-3">
                     <span className="font-bold text-lg capitalize text-blue-700">
                       {pokeB.name}
@@ -370,7 +296,7 @@ export default function Battle() {
                     </div>
                   )}
                 </div>
-                <div className="relative w-64 h-64">
+                <div className="relative w-48 h-48 md:w-64 md:h-64 mx-auto">
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full opacity-50"></div>
                   <PokemonImage
                     src={getPokemonImage(pokeB)}
@@ -386,15 +312,95 @@ export default function Battle() {
               </div>
             )}
           </div>
-          <div className="absolute bottom-8 left-0 right-0 mx-auto w-[600px]">
-            <div className="bg-white/95 backdrop-blur-sm rounded-xl p-6 shadow-xl border-2 border-gray-200">
-              <p className="text-xl font-bold text-gray-800 text-center">
+
+          {/* Player Pokemon (Bottom on mobile, left on desktop) */}
+          <div className="relative lg:absolute lg:bottom-8 lg:left-8 w-full lg:w-80 mx-auto order-3 lg:order-2">
+            {pokeA && (
+              <div
+                className={`transition-all duration-500 mx-auto w-full max-w-sm lg:max-w-none ${
+                  battleState.currentAnimation === 'attack' &&
+                  battleState.battleText.includes(pokeA.name)
+                    ? 'lg:translate-x-16'
+                    : ''
+                }`}
+              >
+                <div className="relative w-48 h-48 md:w-64 md:h-64 mx-auto">
+                  <div className="absolute inset-0 bg-gradient-to-br from-red-100 to-red-200 rounded-full opacity-50"></div>
+                  <PokemonImage
+                    src={getPokemonImage(pokeA)}
+                    alt={pokeA.name}
+                    className={`w-full h-full object-contain transform scale-x-[-1] transition-all duration-300 ${
+                      battleState.currentAnimation === 'damage' &&
+                      battleState.battleText.includes(pokeA.name)
+                        ? 'animate-shake scale-110'
+                        : ''
+                    }`}
+                  />
+                </div>
+                <div className="bg-white/95 backdrop-blur-sm rounded-xl p-3 md:p-4 mt-4 shadow-xl border-2 border-red-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="font-bold text-lg capitalize text-red-700">
+                      {pokeA.name}
+                    </span>
+                    <span className="text-sm bg-red-100 text-red-700 px-2 py-1 rounded-full font-medium">
+                      Lv. 50
+                    </span>
+                  </div>
+                  <div className="mb-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium text-gray-600">
+                        HP
+                      </span>
+                      <span className="text-sm font-bold">
+                        {battleState.pokemonAHP}/100
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-3 shadow-inner">
+                      <div
+                        className="h-full rounded-full transition-all duration-1000 bg-gradient-to-r from-green-500 to-emerald-400 shadow-lg"
+                        style={{ width: `${battleState.pokemonAHP}%` }}
+                      />
+                    </div>
+                  </div>
+                  {statsA && (
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="flex items-center gap-1">
+                        <Heart size={12} className="text-red-500" />
+                        <span className="font-medium">HP:</span>
+                        <span className="text-gray-600">{statsA.hp}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Target size={12} className="text-orange-500" />
+                        <span className="font-medium">ATK:</span>
+                        <span className="text-gray-600">{statsA.attack}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <ShieldIcon size={12} className="text-blue-500" />
+                        <span className="font-medium">DEF:</span>
+                        <span className="text-gray-600">{statsA.defense}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Zap size={12} className="text-yellow-500" />
+                        <span className="font-medium">SPD:</span>
+                        <span className="text-gray-600">{statsA.speed}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Battle Text */}
+          <div className="relative lg:absolute lg:bottom-8 left-0 right-0 mx-auto w-full max-w-lg lg:w-[600px] order-2 lg:order-3 my-4 lg:my-0">
+            <div className="bg-white/95 backdrop-blur-sm rounded-xl p-4 md:p-6 shadow-xl border-2 border-gray-200">
+              <p className="text-lg md:text-xl font-bold text-gray-800 text-center">
                 {battleState.battleText}
               </p>
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-xl border-2 border-red-200">
             <h2 className="text-xl font-bold mb-4 text-red-600 flex items-center gap-2">
               <div className="bg-red-100 p-2 rounded-lg">
@@ -456,7 +462,7 @@ export default function Battle() {
               </div>
               Battle History
             </h2>
-            <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
+            <div className="space-y-3 max-h-[40vh] lg:max-h-[600px] overflow-y-auto pr-2">
               {battleRounds.map((result, index) => (
                 <div
                   key={index}
@@ -545,8 +551,8 @@ export default function Battle() {
           </div>
         </div>
         {isComplete && showResults && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-white rounded-2xl p-8 shadow-2xl border-4 border-yellow-300 max-w-2xl w-full mx-4 relative">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-2xl border-4 border-yellow-300 max-w-2xl w-full relative">
               <button
                 onClick={handleCloseResults}
                 className="absolute top-4 right-4 p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors duration-200"
@@ -558,7 +564,7 @@ export default function Battle() {
                 <div className="bg-gradient-to-r from-yellow-400 to-orange-500 p-4 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
                   <Trophy size={40} className="text-white" />
                 </div>
-                <h2 className="text-3xl font-bold text-gray-800 mb-2">
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
                   Battle Complete!
                 </h2>
                 <p className="text-gray-600">
@@ -566,7 +572,7 @@ export default function Battle() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-6 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div
                   className={`p-6 rounded-xl border-2 transition-all duration-300 ${
                     survivorsA > survivorsB
@@ -578,7 +584,7 @@ export default function Battle() {
                     {battleData.team1Name}
                   </h3>
                   <div className="text-center">
-                    <div className="text-4xl font-bold text-red-600 mb-2">
+                    <div className="text-3xl md:text-4xl font-bold text-red-600 mb-2">
                       {survivorsA}
                     </div>
                     <p className="text-gray-600">Surviving Pokémon</p>
@@ -603,7 +609,7 @@ export default function Battle() {
                     {battleData.team2Name}
                   </h3>
                   <div className="text-center">
-                    <div className="text-4xl font-bold text-blue-600 mb-2">
+                    <div className="text-3xl md:text-4xl font-bold text-blue-600 mb-2">
                       {survivorsB}
                     </div>
                     <p className="text-gray-600">Surviving Pokémon</p>
