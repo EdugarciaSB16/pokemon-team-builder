@@ -11,7 +11,7 @@ export default function TeamSection() {
   return (
     <section className="mb-8">
       <div className="p-6 bg-white/90 backdrop-blur-sm rounded-xl border-4 border-yellow-400 shadow-2xl mb-6">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 md:gap-0">
           <div className="w-32"></div>
           <h2 className="text-2xl font-bold text-gray-800 tracking-widest drop-shadow uppercase text-center flex-1">
             YOUR POKÉMON TEAM
