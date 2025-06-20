@@ -102,59 +102,64 @@ export class BattleService {
       const atkB = this.getPokemonStats(pokeB, 'attack');
       const defB = this.getPokemonStats(pokeB, 'defense');
       const spdB = this.getPokemonStats(pokeB, 'speed');
-      let first = spdA > spdB ? 'A' : spdB > spdA ? 'B' : 'A';
+
       let winner = null;
       let loser = null;
       let message = '';
-      if (first === 'A') {
+
+      // Determine who attacks first (higher speed)
+      const firstAttacker = spdA > spdB ? 'A' : spdB > spdA ? 'B' : 'A';
+
+      if (firstAttacker === 'A') {
+        // A attacks first
         if (atkA > defB) {
+          // A defeats B with superior attack
           hpB[b] = 0;
           winner = 'A';
           loser = 'B';
           message = `${pokeA.name} defeated ${pokeB.name} with superior attack`;
-        } else if (atkB > defA) {
-          hpA[a] = 0;
-          winner = 'B';
-          loser = 'A';
-          message = `${pokeB.name} defeated ${pokeA.name} with superior attack`;
         } else {
-          if (spdA >= spdB) {
+          // A's attack didn't defeat B, so B gets to attack
+          if (atkB > defA) {
+            // B defeats A with superior attack
+            hpA[a] = 0;
+            winner = 'B';
+            loser = 'A';
+            message = `${pokeB.name} defeated ${pokeA.name} with superior attack`;
+          } else {
+            // Neither can defeat the other, faster one wins (A)
             hpB[b] = 0;
             winner = 'A';
             loser = 'B';
             message = `${pokeA.name} wins due to higher speed`;
-          } else {
-            hpA[a] = 0;
-            winner = 'B';
-            loser = 'A';
-            message = `${pokeB.name} wins due to higher speed`;
           }
         }
       } else {
+        // B attacks first
         if (atkB > defA) {
+          // B defeats A with superior attack
           hpA[a] = 0;
           winner = 'B';
           loser = 'A';
           message = `${pokeB.name} defeated ${pokeA.name} with superior attack`;
-        } else if (atkA > defB) {
-          hpB[b] = 0;
-          winner = 'A';
-          loser = 'B';
-          message = `${pokeA.name} defeated ${pokeB.name} with superior attack`;
         } else {
-          if (spdB >= spdA) {
+          // B's attack didn't defeat A, so A gets to attack
+          if (atkA > defB) {
+            // A defeats B with superior attack
+            hpB[b] = 0;
+            winner = 'A';
+            loser = 'B';
+            message = `${pokeA.name} defeated ${pokeB.name} with superior attack`;
+          } else {
+            // Neither can defeat the other, faster one wins (B)
             hpA[a] = 0;
             winner = 'B';
             loser = 'A';
             message = `${pokeB.name} wins due to higher speed`;
-          } else {
-            hpB[b] = 0;
-            winner = 'A';
-            loser = 'B';
-            message = `${pokeA.name} wins due to higher speed`;
           }
         }
       }
+
       rounds.push({
         round: rounds.length + 1,
         pokemonA: pokeA,
@@ -167,6 +172,8 @@ export class BattleService {
         a,
         b,
       });
+
+      // Winner continues fighting, loser's team moves to next Pokemon
       if (winner === 'A') {
         b++;
       } else {
