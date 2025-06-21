@@ -62,6 +62,9 @@ export class BattleService {
 
   // Get Pokémon stats
   static getPokemonStats(pokemon, statName) {
+    if (!pokemon || !pokemon.stats) {
+      return 0;
+    }
     return pokemon.stats.find((s) => s.stat.name === statName)?.base_stat || 0;
   }
 
@@ -69,14 +72,17 @@ export class BattleService {
   static calculateFinalResults(battleResults, team1, team2) {
     const team1Wins = battleResults.filter((r) => r.winner === 'Team 1').length;
     const team2Wins = battleResults.filter((r) => r.winner === 'Team 2').length;
-    const team1Survivors = team1.length - team2Wins;
-    const team2Survivors = team2.length - team1Wins;
+
+    // Calculate survivors based on battle results
+    // Each win means the winning team's pokemon survived that round
+    const team1Survivors = Math.max(0, team1.length - team2Wins);
+    const team2Survivors = Math.max(0, team2.length - team1Wins);
 
     return {
       team1Wins,
       team2Wins,
-      team1Survivors: Math.max(0, team1Survivors),
-      team2Survivors: Math.max(0, team2Survivors),
+      team1Survivors,
+      team2Survivors,
       winner:
         team1Wins > team2Wins
           ? 'Team 1'

@@ -9,7 +9,7 @@ export function useInfiniteScroll({ onLoadMore, isLoading, threshold = 200 }) {
 
       const isAtBottom = scrollTop + windowHeight >= docHeight - threshold;
 
-      if (isAtBottom && !isLoading) {
+      if (isAtBottom && !isLoading && typeof onLoadMore === 'function') {
         onLoadMore();
       }
     };

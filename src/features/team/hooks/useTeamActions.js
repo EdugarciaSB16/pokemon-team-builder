@@ -1,4 +1,4 @@
-import { useTeamStore } from '@/features/team/store';
+import { useTeamStore } from '../store';
 
 export function useTeamActions() {
   const randomizeTeam = useTeamStore((s) => s.randomizeTeam);
