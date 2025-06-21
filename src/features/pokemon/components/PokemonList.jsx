@@ -1,3 +1,4 @@
+import React from 'react';
 import { useEffect, useRef } from 'react';
 import { usePokemonList } from '@/features/pokemon/hooks/usePokemonList';
 import PokemonCard from './PokemonCard';

@@ -1,3 +1,4 @@
+import React from 'react';
 import { useTeamStore } from '@/features/team/store';
 import { Plus } from 'lucide-react';
 

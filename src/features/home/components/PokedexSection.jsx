@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState, useCallback } from 'react';
 import PokemonList from '@/features/pokemon/components/PokemonList';
 import PokemonFilters from '@/features/pokemon/components/PokemonFilters';

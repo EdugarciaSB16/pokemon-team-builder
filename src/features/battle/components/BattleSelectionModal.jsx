@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
@@ -82,7 +83,10 @@ export default function BattleSelectionModal({ onClose }) {
         selectedTeam2Id !== currentTeam.id));
 
   const modal = (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 select-none">
+    <div
+      role="dialog"
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 select-none"
+    >
       <div className="bg-white rounded-lg shadow-xl max-w-xl w-full max-h-[90vh] flex flex-col z-[9999] relative">
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-xl font-bold text-gray-800 flex items-center">
@@ -137,6 +141,7 @@ export default function BattleSelectionModal({ onClose }) {
                   onChange={(e) => setSelectedTeam2(e.target.value)}
                   className="mr-3"
                   disabled={isLoading}
+                  aria-label="Random Team"
                 />
                 <div>
                   <div className="font-medium flex items-center">
@@ -170,6 +175,7 @@ export default function BattleSelectionModal({ onClose }) {
                       }}
                       className="mr-3"
                       disabled={isLoading}
+                      aria-label={`Saved Team ${team.name}`}
                     />
                     <div>
                       <div className="font-medium">{team.name}</div>

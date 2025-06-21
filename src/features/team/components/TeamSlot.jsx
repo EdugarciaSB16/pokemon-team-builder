@@ -1,3 +1,4 @@
+import React from 'react';
 import { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import TeamSlotWrapper from './TeamSlotWrapper';
@@ -44,6 +45,7 @@ export default function TeamSlot({
   return (
     <TeamSlotWrapper
       ref={ref}
+      data-testid="team-slot"
       className={`${sizeClass} ${isDragging ? 'opacity-50' : ''} ${
         isOver ? 'bg-yellow-100' : ''
       }`}

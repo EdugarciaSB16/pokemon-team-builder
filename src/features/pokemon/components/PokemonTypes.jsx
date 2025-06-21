@@ -1,3 +1,5 @@
+import React from 'react';
+
 const typeColors = {
   normal: 'bg-gray-400',
   fire: 'bg-red-500',

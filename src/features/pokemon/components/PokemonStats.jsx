@@ -1,3 +1,5 @@
+import React from 'react';
+
 export default function PokemonStats({ stats = [] }) {
   return (
     <div className="grid grid-cols-2 gap-1.5 text-[10px] mb-3">
