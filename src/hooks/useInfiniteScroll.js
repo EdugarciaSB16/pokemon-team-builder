@@ -14,7 +14,6 @@ export function useInfiniteScroll({ onLoadMore, isLoading, threshold = 200 }) {
       }
     };
 
-    // Trigger once on mount (for short pages)
     handleScroll();
 
     window.addEventListener('scroll', handleScroll);

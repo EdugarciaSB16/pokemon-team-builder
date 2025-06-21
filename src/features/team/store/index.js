@@ -33,7 +33,6 @@ export const useTeamStore = create(
       currentLoadedTeam: null,
       notification: null,
 
-      // Add pokemon to first empty slot
       addPokemon: (pokemon) => {
         const { slots } = get();
         const index = slots.findIndex((slot) => slot === EMPTY_SLOT);
@@ -48,7 +47,6 @@ export const useTeamStore = create(
         });
       },
 
-      // Remove pokemon from specific slot
       removePokemon: (index) => {
         const { slots } = get();
         const newSlots = [...slots];
@@ -60,7 +58,6 @@ export const useTeamStore = create(
         });
       },
 
-      // Clear all slots
       clearTeam: () => {
         set({
           slots: EMPTY_TEAM,
@@ -69,7 +66,6 @@ export const useTeamStore = create(
         });
       },
 
-      // Reorder slots with drag and drop
       reorderTeam: (newOrder) =>
         set({
           slots: newOrder,
@@ -77,7 +73,6 @@ export const useTeamStore = create(
           currentLoadedTeam: null,
         }),
 
-      // Randomize team order
       randomizeTeam: () => {
         const { slots } = get();
         const pokemons = slots.filter(Boolean);
@@ -93,7 +88,6 @@ export const useTeamStore = create(
         });
       },
 
-      // Sort by attack stat
       sortByAttack: () => {
         const { slots } = get();
         const pokemons = slots.filter(Boolean);
@@ -115,7 +109,6 @@ export const useTeamStore = create(
         });
       },
 
-      // Save current team
       saveTeam: (name) => {
         const { slots, savedTeams } = get();
         const validTeam = slots.filter(Boolean);
@@ -142,7 +135,6 @@ export const useTeamStore = create(
         return true;
       },
 
-      // Load a saved team
       loadTeam: (team) => {
         set({
           slots: [...team.slots],
@@ -156,32 +148,27 @@ export const useTeamStore = create(
         });
       },
 
-      // Delete a saved team
       deleteTeam: (id) => {
         const { savedTeams, currentLoadedTeam } = get();
         const newSavedTeams = savedTeams.filter((team) => team.id !== id);
 
         set({
           savedTeams: newSavedTeams,
-          // Clear current loaded team if it was deleted
           currentLoadedTeam:
             currentLoadedTeam?.id === id ? null : currentLoadedTeam,
         });
       },
 
-      // Clear notification
       clearNotification: () => {
         set({ notification: null });
       },
 
-      // Check if current team is ready for battle
       isTeamReadyForBattle: () => {
         const { slots, currentLoadedTeam } = get();
         const filledSlots = slots.filter(Boolean).length;
         return filledSlots === 6 && currentLoadedTeam !== null;
       },
 
-      // Get current team for battle
       getCurrentTeamForBattle: () => {
         const { slots, currentLoadedTeam } = get();
         if (!currentLoadedTeam) return null;

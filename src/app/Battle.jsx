@@ -30,12 +30,10 @@ export default function Battle() {
 
   if (!battleData || battleRounds.length === 0) return null;
 
-  // Get current pokes for animation
   const round = battleRounds[Math.min(currentRound, battleRounds.length - 1)];
   const pokeA = round.pokemonA;
   const pokeB = round.pokemonB;
 
-  // Final results - Calculate survivors correctly
   const survivorsA = battleData.team1.length - faintedPokemonA.size;
   const survivorsB = battleData.team2.length - faintedPokemonB.size;
 
