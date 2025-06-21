@@ -76,8 +76,6 @@ export default function PokemonList({ filters }) {
           ) : null
         )}
       </div>
-
-      {/* Intersection Observer Target */}
       <div
         ref={observerTarget}
         className="h-10 w-full flex items-center justify-center"
